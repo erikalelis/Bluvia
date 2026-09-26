@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<title>BLUVIA</title>
+<meta name="description" content="BLUVIA — tu segundo cerebro. Organizador personal para tareas, turnos, recordatorios y más." />
+<meta name="theme-color" content="#141E54" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="BLUVIA" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/favicon-32.png" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="boot-screen" id="boot-loading">
+  <div class="boot-spinner" aria-hidden="true"></div>
+  <p>Abriendo BLUVIA…</p>
+</div>
+
+<div id="app" hidden>
+
+  <!-- ===================== PANTALLA: INICIO ===================== -->
+  <section class="screen" id="screen-home" data-screen="home">
+    <header class="home-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 1C11 1 4 9.5 4 14.2C4 18.3 7.13 21 11 21C14.87 21 18 18.3 18 14.2C18 9.5 11 1 11 1Z" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="brand-word">BLUVIA</span>
+      </div>
+      <button class="icon-btn" id="btn-open-more" aria-label="Más opciones" title="Más">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="19" cy="12" r="1.8" fill="currentColor"/></svg>
+      </button>
+    </header>
+
+    <div class="home-greeting">
+      <h1 id="greeting-text">Hola, Erika 👋</h1>
+      <p class="home-sub">¿Qué necesita tu atención hoy?</p>
+      <p class="home-date" id="home-date">—</p>
+      <p class="sync-status"><span class="dot"></span><span>Guardado en este teléfono</span></p>
+      <div class="today-progress" id="today-progress" hidden>
+        <div class="today-progress-track"><div class="today-progress-fill" id="today-progress-fill"></div></div>
+        <span id="today-progress-label">0/0 completadas hoy</span>
+      </div>
+    </div>
+
+    <div class="notif-banner" id="notif-banner" hidden>
+      <div class="notif-banner-text">
+        <strong>🔔 Activá los recordatorios</strong>
+        <p>BLUVIA te puede avisar a la hora exacta (mientras el celular tenga la app abierta o en segundo plano).</p>
+      </div>
+      <div class="notif-banner-actions">
+        <button class="notif-banner-btn" id="btn-enable-notifs">Activar</button>
+        <button class="icon-btn" id="btn-dismiss-notif-banner" aria-label="Cerrar">✕</button>
+      </div>
+    </div>
+
+    <button class="capture-cta" id="btn-open-capture">
+      <span class="capture-cta-icon">＋</span>
+      <span>¿Qué necesitas recordar?</span>
+    </button>
+
+    <div class="home-section" id="section-overdue" hidden>
+      <div class="section-head">
+        <h2>Atrasadas</h2>
+        <span class="section-count" id="overdue-count" style="color:#fff;background:var(--danger)">0</span>
+      </div>
+      <div class="item-list" id="list-overdue"></div>
+    </div>
+
+    <div class="home-section">
+      <div class="section-head">
+        <h2>Para hoy</h2>
+        <span class="section-count" id="today-count">0</span>
+      </div>
+      <div class="item-list" id="list-today"></div>
+      <div class="empty-state" id="empty-today" hidden>
+        <span class="empty-state-icon">☕</span>
+        <p>No tenés pendientes para hoy. Buen momento para respirar.</p>
+      </div>
+    </div>
+
+    <div class="home-section">
+      <div class="section-head">
+        <h2>Próximamente</h2>
+      </div>
+      <div class="item-list" id="list-upcoming"></div>
+      <div class="empty-state" id="empty-upcoming" hidden>
+        <span class="empty-state-icon">🗓️</span>
+        <p>Todavía no hay nada agendado más adelante.</p>
+      </div>
+    </div>
+
+    <div class="home-section" id="section-nodate" hidden>
+      <div class="section-head">
+        <h2>Sin fecha</h2>
+        <span class="section-count" id="nodate-count">0</span>
+      </div>
+      <div class="item-list" id="list-nodate"></div>
+    </div>
+
+    <div class="home-scroll-spacer"></div>
+  </section>
+
+  <!-- ===================== PANTALLA: CALENDARIO ===================== -->
+  <section class="screen" id="screen-calendar" data-screen="calendar" hidden>
+    <header class="screen-header">
+      <h1>Calendario</h1>
+    </header>
+    <div class="calendar-nav">
+      <button class="icon-btn" id="cal-prev" aria-label="Mes anterior">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="calendar-month" id="cal-month-label">—</span>
+      <button class="icon-btn" id="cal-next" aria-label="Mes siguiente">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div class="calendar-weekdays">
+      <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
+    </div>
+    <div class="calendar-grid" id="calendar-grid"></div>
+
+    <div class="home-section">
+      <div class="section-head">
+        <h2 id="cal-day-label">Seleccioná un día</h2>
+        <button class="text-btn" id="btn-add-event-day">+ Agregar</button>
+      </div>
+      <div class="item-list" id="list-day"></div>
+      <div class="empty-state" id="empty-day" hidden>
+        <p>Nada agendado para este día.</p>
+      </div>
+    </div>
+    <div class="home-scroll-spacer"></div>
+  </section>
+
+  <!-- ===================== PANTALLA: LISTAS ===================== -->
+  <section class="screen" id="screen-lists" data-screen="lists" hidden>
+    <header class="screen-header">
+      <h1>Listas</h1>
+      <button class="text-btn" id="btn-new-list">+ Nueva lista</button>
+    </header>
+    <div class="lists-tabs" id="lists-tabs"></div>
+    <div class="add-row-wrap">
+      <div class="add-row">
+        <input type="text" id="list-item-input" placeholder="Agregar producto…" autocomplete="off" />
+        <button class="add-row-btn" id="btn-add-list-item" aria-label="Agregar">＋</button>
+      </div>
+      <div class="suggest-dropdown" id="list-suggestions" hidden></div>
+    </div>
+    <div class="chip-row list-filter" id="list-filter">
+      <button class="chip" data-filter="todos" data-selected="true">Todos</button>
+      <button class="chip" data-filter="pendientes">Pendientes</button>
+      <button class="chip" data-filter="comprados">Comprados</button>
+    </div>
+    <div class="item-list" id="list-items"></div>
+    <div class="empty-state" id="empty-list" hidden>
+      <p>Esta lista está vacía por ahora.</p>
+    </div>
+    <div class="home-scroll-spacer"></div>
+  </section>
+
+  <!-- ===================== PANTALLA: MÁS (menú de categorías) ===================== -->
+  <section class="screen" id="screen-more" data-screen="more" hidden>
+    <header class="screen-header">
+      <h1>Más</h1>
+    </header>
+    <div class="more-grid" id="more-grid">
+      <button class="more-tile" data-category="idea" style="--tile-bg: rgba(224,179,36,0.16)">
+        <span class="more-tile-icon">💡</span><span>Ideas</span>
+      </button>
+      <button class="more-tile" data-category="mia" style="--tile-bg: rgba(138,92,246,0.14)">
+        <span class="more-tile-icon">👩‍👧</span><span>Mia</span>
+      </button>
+      <button class="more-tile" data-category="ninera" style="--tile-bg: rgba(43,179,163,0.14)">
+        <span class="more-tile-icon">👩‍🍼</span><span>Niñera</span>
+      </button>
+      <button class="more-tile" data-category="medicamento" style="--tile-bg: rgba(255,107,74,0.14)">
+        <span class="more-tile-icon">💊</span><span>Medicamentos</span>
+      </button>
+      <button class="more-tile" data-category="cumpleanos" style="--tile-bg: rgba(232,93,158,0.14)">
+        <span class="more-tile-icon">🎁</span><span>Cumpleaños</span>
+      </button>
+      <button class="more-tile" data-category="trabajo" style="--tile-bg: rgba(34,48,126,0.12)">
+        <span class="more-tile-icon">💼</span><span>Trabajo</span>
+      </button>
+      <button class="more-tile" id="tile-completed" style="--tile-bg: rgba(31,157,110,0.14)">
+        <span class="more-tile-icon">✅</span><span>Completados</span>
+      </button>
+      <button class="more-tile" id="tile-trash" style="--tile-bg: rgba(148,152,168,0.16)">
+        <span class="more-tile-icon">🗑️</span><span>Papelera</span>
+      </button>
+    </div>
+
+    <p class="more-section-label">Copia de seguridad</p>
+    <div class="backup-row">
+      <button class="backup-btn" id="btn-export-backup"><span class="emoji">⬇️</span><span>Exportar copia</span></button>
+      <button class="backup-btn" id="btn-import-backup"><span class="emoji">⬆️</span><span>Importar copia</span></button>
+      <input type="file" id="import-file-input" accept="application/json" hidden />
+    </div>
+    <p class="backup-note">Guardá una copia de vez en cuando (por ejemplo antes de cambiar de celular). Se descarga un archivo que después podés importar acá mismo.</p>
+
+    <div class="home-section" id="category-detail" hidden>
+      <div class="section-head">
+        <button class="text-btn" id="btn-category-back">← Volver</button>
+        <h2 id="category-title">—</h2>
+        <button class="text-btn" id="btn-add-category-item">+ Agregar</button>
+      </div>
+      <div class="item-list" id="list-category"></div>
+      <div class="empty-state" id="empty-category" hidden>
+        <p>Todavía no agregaste nada acá.</p>
+      </div>
+    </div>
+
+    <div class="home-section" id="trash-detail" hidden>
+      <div class="section-head">
+        <button class="text-btn" id="btn-trash-back">← Volver</button>
+        <h2>Papelera</h2>
+        <button class="text-btn" id="btn-empty-trash" hidden>Vaciar</button>
+      </div>
+      <p class="trash-note">Lo que eliminás queda acá 30 días por si te arrepentís, y después se borra solo.</p>
+      <div class="item-list" id="trash-list"></div>
+      <div class="empty-state" id="empty-trash" hidden>
+        <p>La papelera está vacía.</p>
+      </div>
+    </div>
+
+    <div class="home-scroll-spacer"></div>
+  </section>
+
+  <!-- ===================== NAV INFERIOR ===================== -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="nav-btn active" data-nav="home" aria-label="Inicio">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 11.5L12 4l8 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9a1 1 0 001 1h4v-6h2v6h4a1 1 0 001-1v-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Inicio</span>
+    </button>
+    <button class="nav-btn" data-nav="calendar" aria-label="Calendario">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="16" rx="2.5" stroke="currentColor" stroke-width="2"/><path d="M3.5 9.5h17" stroke="currentColor" stroke-width="2"/><path d="M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Calendario</span>
+    </button>
+    <button class="nav-btn nav-btn-add" data-nav="add" aria-label="Agregar">
+      <span class="nav-add-circle">＋</span>
+    </button>
+    <button class="nav-btn" data-nav="lists" aria-label="Listas">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 7h.01M5 12h.01M5 17h.01" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M9.5 7h9M9.5 12h9M9.5 17h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Listas</span>
+    </button>
+    <button class="nav-btn" data-nav="more" aria-label="Más">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="13" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="4" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="13" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/></svg>
+      <span>Más</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- ===================== MODAL: CAPTURA RÁPIDA ===================== -->
+<div class="sheet-overlay" id="capture-overlay" hidden>
+  <div class="sheet" id="capture-sheet" role="dialog" aria-modal="true" aria-labelledby="capture-title">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <h2 id="capture-title">¿Qué necesitas recordar?</h2>
+      <button class="icon-btn" id="btn-close-capture" aria-label="Cerrar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <textarea id="capture-text" class="capture-input" rows="2" placeholder="Ej: Pedir turno médico mañana"></textarea>
+    <p class="capture-hint" id="capture-date-hint" hidden></p>
+
+    <div class="chip-row" id="category-chips">
+      <button class="chip" data-cat="tarea" data-selected="true"><span>✅</span>Tarea</button>
+      <button class="chip" data-cat="recordatorio"><span>⏰</span>Recordatorio</button>
+      <button class="chip" data-cat="turno"><span>📅</span>Turno / Evento</button>
+      <button class="chip" data-cat="medicamento"><span>💊</span>Medicamento</button>
+      <button class="chip" data-cat="compra"><span>🛒</span>Compra</button>
+      <button class="chip" data-cat="idea"><span>💡</span>Idea</button>
+      <button class="chip" data-cat="trabajo"><span>💼</span>Trabajo</button>
+      <button class="chip" data-cat="mia"><span>👩‍👧</span>Mia</button>
+      <button class="chip" data-cat="ninera"><span>👩‍🍼</span>Niñera</button>
+      <button class="chip" data-cat="cumpleanos"><span>🎁</span>Cumpleaños / Regalo</button>
+    </div>
+
+    <button class="text-btn more-options-toggle" id="btn-toggle-more-options">Más opciones (fecha, hora, notas) ▾</button>
+
+    <div class="capture-more" id="capture-more-options" hidden>
+      <div class="field-row">
+        <label>
+          <span>Fecha</span>
+          <input type="date" id="capture-date" />
+        </label>
+        <label>
+          <span>Hora</span>
+          <input type="time" id="capture-time" />
+        </label>
+      </div>
+      <label class="field-block" id="field-persona" hidden>
+        <span>Persona</span>
+        <input type="text" id="capture-persona" placeholder="Ej: Mia" />
+      </label>
+      <label class="field-block" id="field-frecuencia" hidden>
+        <span>Frecuencia</span>
+        <input type="text" id="capture-frecuencia" placeholder="Ej: Cada 8 horas / Diario" />
+      </label>
+      <label class="field-block">
+        <span>Notas (opcional)</span>
+        <textarea id="capture-notes" rows="2" placeholder="Detalles adicionales…"></textarea>
+      </label>
+    </div>
+
+    <button class="save-btn" id="btn-save-capture">Guardar</button>
+  </div>
+</div>
+
+<!-- ===================== MODAL: DETALLE DE ITEM ===================== -->
+<div class="sheet-overlay" id="detail-overlay" hidden>
+  <div class="sheet" id="detail-sheet" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <h2 id="detail-title">Detalle</h2>
+      <button class="icon-btn" id="btn-close-detail" aria-label="Cerrar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div id="detail-body" class="detail-body"></div>
+    <div class="detail-actions">
+      <button class="save-btn" id="btn-toggle-complete">Marcar como completado</button>
+      <button class="edit-btn" id="btn-edit-item">✏️ Editar</button>
+      <button class="danger-btn" id="btn-delete-item">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: NUEVA LISTA ===================== -->
+<div class="sheet-overlay" id="newlist-overlay" hidden>
+  <div class="sheet sheet-compact" role="dialog" aria-modal="true" aria-labelledby="newlist-title">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <h2 id="newlist-title">Nueva lista</h2>
+      <button class="icon-btn" id="btn-close-newlist" aria-label="Cerrar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <label class="field-block">
+      <span>Nombre de la lista</span>
+      <input type="text" id="newlist-name" placeholder="Ej: Ferretería, Farmacia…" />
+    </label>
+    <button class="save-btn" id="btn-create-list">Crear lista</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>
