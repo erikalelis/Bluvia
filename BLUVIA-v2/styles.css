@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BLUVIA — estilos
+   BluvIA — estilos
    Paleta: azul profundo elegante + blanco + grises suaves + acento coral
    ========================================================================== */
 
@@ -754,3 +754,14 @@ img{ max-width: 100%; }
   }
   .bottom-nav{ border-radius: 0 0 28px 28px; }
 }
+
+/* ---------- marca al pie ---------- */
+.app-foot{
+  text-align: center;
+  padding: 18px 0 8px;
+  font-family: "Sora", sans-serif;
+  font-size: 11px; font-weight: 600; letter-spacing: .04em;
+  color: var(--ink-faint);
+  opacity: .8;
+}
+.app-foot span{ color: #16998A; }

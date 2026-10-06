@@ -1,8 +1,8 @@
-/* BLUVIA — service worker
+/* BluvIA — service worker
    Cachea los archivos estáticos para que la app abra rápido y funcione
    sin conexión. Los datos del usuario viven en IndexedDB, no acá. */
 
-const CACHE_NAME = "bluvia-cache-v5";
+const CACHE_NAME = "bluvia-cache-v6";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -22,7 +22,7 @@ self.addEventListener("install", (event) => {
   );
 });
 
-/* Al tocar una notificación, lleva a BLUVIA (la abre si estaba cerrada,
+/* Al tocar una notificación, lleva a BluvIA (la abre si estaba cerrada,
    o la enfoca si ya estaba abierta en una pestaña). */
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
@@ -45,7 +45,7 @@ self.addEventListener("activate", (event) => {
 });
 
 /* Estrategia: network-first para TODO. Así, cada vez que hay conexión,
-   BLUVIA siempre muestra la versión publicada en ese momento — nada de
+   BluvIA siempre muestra la versión publicada en ese momento — nada de
    quedarse "pegada" en una versión vieja por el caché. Sin conexión, usa
    la última copia guardada para que la app siga funcionando igual. */
 self.addEventListener("fetch", (event) => {

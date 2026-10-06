@@ -1,6 +1,6 @@
 {
-  "name": "BLUVIA — Organizador personal",
-  "short_name": "BLUVIA",
+  "name": "BluvIA — Organizador personal",
+  "short_name": "BluvIA",
   "description": "Tu segundo cerebro: tareas, turnos, recordatorios, listas e ideas en un solo lugar.",
   "start_url": "./index.html",
   "scope": "./",

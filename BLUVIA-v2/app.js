@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BLUVIA — lógica de la aplicación
+   BluvIA — lógica de la aplicación
    Los datos viven en IndexedDB (mucho más resistente que localStorage a que
    el navegador los borre solo). Además hay copia de seguridad manual
    (exportar/importar un .json) para no depender de un solo dispositivo.
@@ -786,9 +786,9 @@
     const reader = new FileReader();
     reader.onload = () => {
       let data;
-      try { data = JSON.parse(reader.result); } catch (err) { showToast("El archivo no es una copia válida de BLUVIA."); return; }
+      try { data = JSON.parse(reader.result); } catch (err) { showToast("El archivo no es una copia válida de BluvIA."); return; }
       if (!data || !Array.isArray(data.items) || !Array.isArray(data.lists)) {
-        showToast("El archivo no es una copia válida de BLUVIA.");
+        showToast("El archivo no es una copia válida de BluvIA.");
         return;
       }
       if (!confirm(`Esto va a REEMPLAZAR todo lo que tenés ahora por la copia del ${data.exportedAt ? new Date(data.exportedAt).toLocaleDateString("es-AR") : "archivo"}. ¿Continuar?`)) return;
@@ -1070,7 +1070,7 @@
 
   /* ------------------------------------------------------------------ */
   /* 11. RECORDATORIOS CON NOTIFICACIÓN (alarma)                         */
-  /* Funciona mientras BLUVIA está abierta o en segundo plano en el      */
+  /* Funciona mientras BluvIA está abierta o en segundo plano en el      */
   /* celular. No es una alarma nativa del sistema: si el navegador se    */
   /* cierra del todo o el celular la "duerme" por completo, no suena.    */
   /* ------------------------------------------------------------------ */
@@ -1166,7 +1166,18 @@
 
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("service-worker.js").catch(() => {});
+        navigator.serviceWorker.register("service-worker.js", { updateViaCache: "none" }).then(reg => {
+          const check = () => reg.update().catch(() => {});
+          document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });
+          setInterval(check, 30 * 60 * 1000);
+        }).catch(() => {});
+        // Cuando hay versión nueva, recarga sola (solo si ya había una instalada)
+        if (navigator.serviceWorker.controller) {
+          let reloaded = false;
+          navigator.serviceWorker.addEventListener("controllerchange", () => {
+            if (reloaded) return; reloaded = true; location.reload();
+          });
+        }
       });
     }
   }
